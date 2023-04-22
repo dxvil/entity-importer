@@ -13,6 +13,8 @@ import { DepartmentService } from './department/department.service';
 import { Statement } from './statement/statement.entity';
 import { StatementService } from './statement/statement.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ImporterController } from './importer/importer.controller';
+import { Importer } from './importer/importer';
 
 @Module({
   imports: [
@@ -27,8 +29,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       entities: [Statement, Department, Rates, Salary, Donation, Employee],
     }),
   ],
-  controllers: [EmployeeController],
+  controllers: [EmployeeController, ImporterController],
   providers: [
+    Importer,
     EmployeeService,
     RatesService,
     SalaryService,
