@@ -20,5 +20,7 @@ export class ImporterController {
     if (parsedFile instanceof Error) {
       return parsedFile;
     }
+
+    console.log(parsedFile);
   }
 }
