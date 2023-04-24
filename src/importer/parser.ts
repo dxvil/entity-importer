@@ -2,6 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Department } from 'src/department/department.entity';
 import { Donation } from 'src/donation/donation';
 import { Employee } from 'src/employee/employee.entity';
+import {
+  DEPARTMENT,
+  DONATION,
+  DONATIONS,
+  EMPLOYEE,
+  PARSING_VALUES,
+  RATE,
+  SALARY,
+  STATEMENT,
+} from 'src/employee/employeeConstans';
 import { Rates } from 'src/rates/rates.entity';
 import { Statement } from 'src/statement/statement.entity';
 import { handleFileUpload } from './fileUpload';
@@ -9,16 +19,8 @@ import { formatData } from './parseFileExtensions';
 
 @Injectable()
 export class Parser {
-  parsedFields: string[] = [
-    'Employee',
-    'Department',
-    'Salary',
-    'Statement',
-    'Donation',
-    'Rates',
-    'Rate',
-    ':',
-  ];
+  parsedFields: string[] = PARSING_VALUES;
+
   async parseTextFile(file: Express.Multer.File) {
     try {
       await handleFileUpload(file);
@@ -41,7 +43,7 @@ export class Parser {
       const listOfEmployees: Employee[] = [];
       const listOfRates: Rates[] = [];
       let currentKey = '';
-      let donationKey: null | number = null;
+      let donationKey = 0;
       let salaryKey = 0;
       let ratesKey = 0;
 
@@ -49,44 +51,49 @@ export class Parser {
         string.trim();
 
         switch (string) {
-          case 'Employee':
+          case EMPLOYEE:
             if (listOfEmployees.length !== 0) {
               listKey++;
             }
-            currentKey = 'Employee';
-            donationKey = null;
+            currentKey = EMPLOYEE.toLowerCase();
+            donationKey = 0;
             salaryKey = 0;
             listOfEmployees.push(new Employee());
             break;
-          case 'Department':
+          case DEPARTMENT:
             //add deparment value to employee
-            currentKey = 'Department';
+            currentKey = DEPARTMENT.toLowerCase();
             listOfEmployees[listKey][currentKey] = new Department();
             break;
-          case 'Salary':
+          case SALARY:
             //add salary value to employee
-            currentKey = 'Salary';
+            currentKey = SALARY.toLowerCase();
             listOfEmployees[listKey][currentKey] = [];
             break;
-          case 'Statement':
+          case STATEMENT:
             //add new statement to employee salary
-            if (listOfEmployees[listKey]['Salary'].length !== 0) {
+            const category = SALARY.toLowerCase();
+            if (listOfEmployees[listKey][category].length !== 0) {
               salaryKey++;
             }
-            listOfEmployees[listKey]['Salary'].push(new Statement());
-            currentKey = 'Statement';
+            listOfEmployees[listKey][category].push(new Statement());
+            currentKey = STATEMENT.toLowerCase();
             break;
-          case 'Donation':
+          case DONATION:
             //add donation object
-            donationKey === null ? 0 : donationKey++;
-            currentKey = 'Donation' + donationKey;
-            listOfEmployees[listKey][currentKey] = new Donation();
+            if (!listOfEmployees[listKey][DONATIONS]) {
+              listOfEmployees[listKey][DONATIONS] = [];
+            } else {
+              donationKey++;
+            }
+            currentKey = DONATIONS;
+            listOfEmployees[listKey][currentKey].push(new Donation());
             break;
-          case 'Rate':
+          case RATE:
             if (listOfRates.length !== 0) {
               ratesKey++;
             }
-            currentKey = 'Rate';
+            currentKey = RATE.toLowerCase();
             listOfRates.push(new Rates());
             break;
         }
@@ -95,13 +102,16 @@ export class Parser {
           //feeling objects with values based on key
           const [key, val] = string.split(':');
 
-          if (currentKey === 'Employee') {
+          if (currentKey === EMPLOYEE.toLowerCase()) {
             //add values of employee
             listOfEmployees[listKey][key] = val;
-          } else if (currentKey === 'Statement') {
+          } else if (currentKey === DONATIONS) {
+            listOfEmployees[listKey][currentKey][donationKey][key] = val;
+          } else if (currentKey === STATEMENT.toLowerCase()) {
             //add values of statement
-            listOfEmployees[listKey]['Salary'][salaryKey][key] = val;
-          } else if (currentKey === 'Rate') {
+            listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][key] =
+              val;
+          } else if (currentKey === RATE.toLowerCase()) {
             listOfRates[ratesKey][key] = val;
           } else {
             //add other values to object that don't base on special structure

@@ -8,6 +8,7 @@ export const validatorDto = async <T extends ClassConstructor<any>>(
 ) => {
   const objInstance = plainToClass(dto, obj);
   const errors = await validate(objInstance);
+
   const res = {
     failed: [],
     values: [],

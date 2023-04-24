@@ -1,10 +1,8 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { Employee } from './employee/employee.entity';
 import { EmployeeService } from './employee/employee.service';
 import { EmployeeController } from './employee/employee.controller';
 import { Rates } from './rates/rates.entity';
-import { Salary } from './salary/salary.entity';
-import { SalaryService } from './salary/salary.service';
 import { Donation } from './donation/donation';
 import { DonationService } from './donation/donation.service';
 import { Department } from './department/department.entity';
@@ -12,7 +10,6 @@ import { DepartmentService } from './department/department.service';
 import { Statement } from './statement/statement.entity';
 import { StatementService } from './statement/statement.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ImporterController } from './importer/importer.controller';
 import { RatesModule } from './rates/rates.module';
 import { ImporterModule } from './importer/importer.module';
 
@@ -26,7 +23,7 @@ import { ImporterModule } from './importer/importer.module';
       password: 'password',
       database: 'employees',
       synchronize: true,
-      entities: [Statement, Department, Rates, Salary, Donation, Employee],
+      entities: [Statement, Department, Rates, Donation, Employee],
     }),
     ImporterModule,
     RatesModule,
@@ -34,7 +31,6 @@ import { ImporterModule } from './importer/importer.module';
   controllers: [EmployeeController],
   providers: [
     EmployeeService,
-    SalaryService,
     DonationService,
     DepartmentService,
     StatementService,

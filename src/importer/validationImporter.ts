@@ -1,15 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { RatesDto } from 'src/rates/rates.dto';
 import { validatorDto } from 'src/shared/validation';
 
 @Injectable()
 export class ValidationImporter {
-  async validateRates(ratesList: RatesDto[]) {
+  async validate<T>(objList: T[], type) {
     const errorList = [];
 
-    for (const rate of ratesList) {
-      const errors = await validatorDto(RatesDto, rate);
-      errorList.push(errors);
+    for (const obj of objList) {
+      const errors = await validatorDto(type, obj);
+      if (errors.errors.length > 0) {
+        errorList.push(errors);
+      }
     }
 
     return errorList;

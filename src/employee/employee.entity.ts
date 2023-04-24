@@ -1,6 +1,6 @@
 import { Department } from 'src/department/department.entity';
 import { Donation } from 'src/donation/donation';
-import { Salary } from 'src/salary/salary.entity';
+import { Statement } from 'src/statement/statement.entity';
 import {
   Column,
   Entity,
@@ -25,11 +25,11 @@ export class Employee {
   })
   department: Department;
 
-  @ManyToOne(() => Salary, {
+  @OneToMany(() => Statement, (statement) => statement.id, {
     eager: true,
   })
-  salary: Salary;
+  salary: Statement[];
 
   @OneToMany(() => Donation, (dontation) => dontation.id)
-  dontations: Donation[];
+  donations: Donation[];
 }

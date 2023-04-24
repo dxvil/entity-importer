@@ -1,8 +1,7 @@
-import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, ValidateNested } from 'class-validator';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { DepartmentDto } from 'src/department/department.dto';
 import { DonationDto } from 'src/donation/donation.dto';
-import { SalaryDto } from 'src/salary/salary.dto';
+import { StatementDto } from 'src/statement/statement.dto';
 
 export class EmployeeDto {
   @IsNotEmpty()
@@ -11,12 +10,9 @@ export class EmployeeDto {
   surname: string;
   @IsNotEmpty()
   @ValidateNested()
-  @Type(() => DepartmentDto)
   department: DepartmentDto;
   @ValidateNested()
-  @Type(() => SalaryDto)
-  salary: SalaryDto;
-  @IsArray()
+  salary: StatementDto[];
   @ValidateNested()
   donations: DonationDto[];
 }
