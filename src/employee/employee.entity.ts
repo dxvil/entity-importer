@@ -22,14 +22,19 @@ export class Employee {
 
   @ManyToOne(() => Department, {
     eager: true,
+    cascade: true,
   })
   department: Department;
 
   @OneToMany(() => Statement, (statement) => statement.id, {
     eager: true,
+    cascade: true,
   })
   salary: Statement[];
 
-  @OneToMany(() => Donation, (dontation) => dontation.id)
+  @OneToMany(() => Donation, (dontation) => dontation.id, {
+    eager: true,
+    cascade: true,
+  })
   donations: Donation[];
 }

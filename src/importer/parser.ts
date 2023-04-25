@@ -13,6 +13,7 @@ import {
   STATEMENT,
 } from 'src/employee/employeeConstans';
 import { Rates } from 'src/rates/rates.entity';
+import { monthesFormat } from 'src/shared/monthes';
 import { Statement } from 'src/statement/statement.entity';
 import { handleFileUpload } from './fileUpload';
 import { formatData } from './parseFileExtensions';
@@ -100,7 +101,12 @@ export class Parser {
 
         if (string.includes(':')) {
           //feeling objects with values based on key
-          const [key, val] = string.split(':');
+          let [key, val]: any = string.trim().split(':');
+
+          if (key === 'date') {
+            const [weekDay, month, day, year] = val.trim().split(' ');
+            val = new Date(year, monthesFormat[month], day);
+          }
 
           if (currentKey === EMPLOYEE.toLowerCase()) {
             //add values of employee

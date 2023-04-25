@@ -1,10 +1,10 @@
-import { IsDate, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
+import { IsDateString, IsDecimal, IsNotEmpty } from 'class-validator';
 
 export class StatementDto {
-  @IsNumber()
-  @IsPositive()
+  @IsNotEmpty()
+  @IsDecimal()
   amount: number;
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   date: Date;
 }
