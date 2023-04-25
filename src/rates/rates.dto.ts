@@ -1,10 +1,4 @@
-import {
-  IsDate,
-  IsNotEmpty,
-  IsNumber,
-  IsPositive,
-  IsString,
-} from 'class-validator';
+import { IsDate, IsDecimal, IsNotEmpty, IsString } from 'class-validator';
 
 export class RatesDto {
   @IsDate()
@@ -13,7 +7,6 @@ export class RatesDto {
   @IsNotEmpty()
   @IsString()
   sign: string;
-  @IsNumber()
-  @IsPositive()
+  @IsDecimal()
   value: number;
 }

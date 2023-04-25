@@ -101,10 +101,10 @@ export class Parser {
 
         if (string.includes(':')) {
           //feeling objects with values based on key
-          let [key, val]: any = string.trim().split(':');
+          let [key, val]: any = string.split(': ');
 
           if (key === 'date') {
-            const [weekDay, month, day, year] = val.trim().split(' ');
+            const [_, month, day, year] = val.trim().split(' ');
             val = new Date(year, monthesFormat[month], day);
           }
 

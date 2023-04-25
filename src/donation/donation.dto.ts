@@ -1,8 +1,7 @@
-import { IsDate, IsNumber, IsPositive } from 'class-validator';
+import { IsDate, IsDecimal } from 'class-validator';
 
 export class DonationDto {
-  @IsNumber()
-  @IsPositive()
+  @IsDecimal()
   amount: number;
   @IsDate()
   date: Date;
