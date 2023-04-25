@@ -11,6 +11,8 @@ export class Rates {
   @Column()
   sign: string;
 
-  @Column()
-  value: number;
+  @Column({
+    type: 'decimal',
+  })
+  value: string;
 }

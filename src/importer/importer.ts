@@ -1,5 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { EmployeeDto } from 'src/employee/employee.dto';
+import { Injectable } from '@nestjs/common';
 import { Employee } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
@@ -13,21 +12,38 @@ export class Importer {
   ) {}
 
   async importRates(ratesList: Rates[]) {
+    const res = {
+      uploaded: [],
+      errors: [],
+    };
+
     try {
-      return ratesList.forEach(async (rate) => {
-        return this.ratesService.createRate(rate);
-      });
+      for (const rate of ratesList) {
+        await this.ratesService.createRate(rate);
+        res.uploaded.push(rate);
+      }
     } catch (err) {
-      throw new HttpException(err.message, 400);
+      res.errors.push(err.message);
     }
+
+    return res;
   }
-  async importEmployees(employeeList: EmployeeDto[] | Employee[]) {
+
+  async importEmployees(employeeList: Employee[]) {
+    const res = {
+      uploaded: [],
+      errors: [],
+    };
+
     try {
-      return employeeList.forEach(async (employee) => {
-        return this.employeeService.createEmployee(employee);
-      });
+      for (const employee of employeeList) {
+        await this.employeeService.createEmployee(employee);
+        res.uploaded.push(employee);
+      }
     } catch (err) {
-      throw new HttpException(err.message, 400);
+      res.errors.push(err.message);
     }
+
+    return res;
   }
 }

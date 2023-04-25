@@ -1,4 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Department } from './department.entity';
 
 @Injectable()
-export class DepartmentService {}
+export class DepartmentService {
+  constructor(
+    @InjectRepository(Department)
+    private departmentRepository: Repository<Department>,
+  ) {}
+
+  async createDepartment(department: Department) {
+    return await this.departmentRepository.save(department);
+  }
+
+  async findDepartment(id: number) {
+    return await this.departmentRepository.findOneBy({ id });
+  }
+}

@@ -1,17 +1,11 @@
 import { Department } from 'src/department/department.entity';
-import { Donation } from 'src/donation/donation';
+import { Donation } from 'src/donation/donation.entity';
 import { Statement } from 'src/statement/statement.entity';
-import {
-  Column,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity('employees')
 export class Employee {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   id: number;
 
   @Column()
@@ -20,21 +14,21 @@ export class Employee {
   @Column()
   surname: string;
 
-  @ManyToOne(() => Department, {
+  @ManyToOne(() => Department, (department) => department.id, {
     eager: true,
-    cascade: true,
+    cascade: ['insert'],
   })
   department: Department;
 
-  @OneToMany(() => Statement, (statement) => statement.id, {
+  @OneToMany(() => Statement, (statement) => statement.employee, {
     eager: true,
-    cascade: true,
+    cascade: ['insert'],
   })
   salary: Statement[];
 
   @OneToMany(() => Donation, (dontation) => dontation.id, {
     eager: true,
-    cascade: true,
+    cascade: ['insert'],
   })
   donations: Donation[];
 }

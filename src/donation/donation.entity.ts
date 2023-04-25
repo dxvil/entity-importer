@@ -1,17 +1,14 @@
 import { Employee } from 'src/employee/employee.entity';
 import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 
-@Entity('statements')
-export class Statement {
+@Entity('donation')
+export class Donation {
   @PrimaryColumn()
   id: number;
 
   @Column()
-  amount: number;
+  amount: string;
 
-  @Column()
-  date: Date;
-
-  @ManyToOne(() => Employee, (employee) => employee.salary)
+  @ManyToOne(() => Employee, (employee) => employee.donations)
   employee: Employee;
 }

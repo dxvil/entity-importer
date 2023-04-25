@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Department } from 'src/department/department.entity';
-import { Donation } from 'src/donation/donation';
+import { Donation } from 'src/donation/donation.entity';
 import { Employee } from 'src/employee/employee.entity';
 import {
   DEPARTMENT,
@@ -104,17 +104,38 @@ export class Parser {
           let [key, val]: any = string.split(': ');
 
           if (key === 'date') {
-            const [_, month, day, year] = val.trim().split(' ');
+            let [_, month, day, year] = val.trim().split(' ');
+            if (year.match(/[a-zA-Z]/g)) {
+              year = year.replace(/[a-zA-Z]/g, '');
+            }
             val = new Date(year, monthesFormat[month], day);
+          }
+          if (key === 'id') {
+            val = +val;
           }
 
           if (currentKey === EMPLOYEE.toLowerCase()) {
             //add values of employee
             listOfEmployees[listKey][key] = val;
           } else if (currentKey === DONATIONS) {
+            if (
+              !listOfEmployees[listKey][currentKey][donationKey]['employeeId']
+            ) {
+              listOfEmployees[listKey][currentKey][donationKey]['employeeId'] =
+                listOfEmployees[listKey].id;
+            }
             listOfEmployees[listKey][currentKey][donationKey][key] = val;
           } else if (currentKey === STATEMENT.toLowerCase()) {
             //add values of statement
+            if (
+              !listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][
+                'employeeId'
+              ]
+            ) {
+              listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][
+                'employeeId'
+              ] = listOfEmployees[listKey].id;
+            }
             listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][key] =
               val;
           } else if (currentKey === RATE.toLowerCase()) {

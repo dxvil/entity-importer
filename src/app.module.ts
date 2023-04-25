@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { Employee } from './employee/employee.entity';
 import { Rates } from './rates/rates.entity';
-import { Donation } from './donation/donation';
+import { Donation } from './donation/donation.entity';
 import { DonationService } from './donation/donation.service';
 import { Department } from './department/department.entity';
 import { DepartmentService } from './department/department.service';
@@ -11,6 +11,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RatesModule } from './rates/rates.module';
 import { ImporterModule } from './importer/importer.module';
 import { EmployeeModule } from './employee/employee.module';
+import { DepartmentModule } from './department/department.module';
+import { StatementModule } from './statement/statement.module';
 
 // type: 'mysql',
 // host: 'employees.clt3fa5eyyle.eu-north-1.rds.amazonaws.com',
@@ -33,7 +35,9 @@ import { EmployeeModule } from './employee/employee.module';
     ImporterModule,
     RatesModule,
     EmployeeModule,
+    DepartmentModule,
+    StatementModule,
   ],
-  providers: [DonationService, DepartmentService, StatementService],
+  providers: [DonationService],
 })
 export class AppModule {}

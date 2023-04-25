@@ -39,25 +39,29 @@ export class ImporterController {
       rates,
       RatesDto,
     );
-    console.log(rates);
+
     if (ratesErrors.length > 0) {
       throw new BadRequestException(ratesErrors);
     }
-    
+
     const employeesErrors = await this.validator.validate<EmployeeDto>(
       employees,
       EmployeeDto,
     );
-     
+
     if (employeesErrors.length > 0) {
       throw new BadRequestException(employeesErrors);
     }
+    try {
+      const importRates = await this.importer.importRates(rates);
+      const importEmployees = await this.importer.importEmployees(employees);
 
-    // try {
-    //   await this.importer.importRates(rates);
-    //   return await this.importer.importEmployees(employees);
-    // } catch (err) {
-    //   throw new BadRequestException(err);
-    // }
+      return {
+        rates: importRates,
+        employees: importEmployees,
+      };
+    } catch (err) {
+      throw new BadRequestException(err);
+    }
   }
 }

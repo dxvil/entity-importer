@@ -8,5 +8,5 @@ export class RatesDto {
   @IsString()
   sign: string;
   @IsDecimal()
-  value: number;
+  value: string;
 }
