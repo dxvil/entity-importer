@@ -1,5 +1,5 @@
 import { Employee } from 'src/employee/employee.entity';
-import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('statements')
 export class Statement {
@@ -12,6 +12,7 @@ export class Statement {
   @Column()
   date: Date;
 
-  @ManyToOne(() => Employee, (employee) => employee.salary)
-  employee: Employee;
+  @ManyToOne(() => Employee)
+  @JoinColumn({ name: 'employeeId' })
+  employeeId: number;
 }

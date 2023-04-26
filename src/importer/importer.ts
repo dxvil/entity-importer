@@ -1,8 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import { Donation } from 'src/donation/donation.entity';
 import { Employee } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
 import { RatesService } from 'src/rates/rates.service';
+
+function filterUSDDonation(donations: Donation[]) {
+  const filteredByUSD: Donation[] = Object.values(
+    donations.filter((d) => d.amount.includes('USD')),
+  );
+
+  if (filteredByUSD.length === 0) return [];
+
+  return filteredByUSD.map((d) => {
+    d.amount = d.amount.replace('USD', '').replace(' ', '');
+    return d;
+  });
+}
 
 @Injectable()
 export class Importer {
@@ -36,6 +50,12 @@ export class Importer {
     };
 
     try {
+      for (const employee of employeeList) {
+        if (employee.donations) {
+          employee.donations = filterUSDDonation(employee.donations);
+        }
+      }
+
       for (const employee of employeeList) {
         await this.employeeService.createEmployee(employee);
         res.uploaded.push(employee);

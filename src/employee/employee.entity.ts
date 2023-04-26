@@ -1,7 +1,14 @@
 import { Department } from 'src/department/department.entity';
 import { Donation } from 'src/donation/donation.entity';
 import { Statement } from 'src/statement/statement.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 
 @Entity('employees')
 export class Employee {
@@ -14,19 +21,19 @@ export class Employee {
   @Column()
   surname: string;
 
-  @ManyToOne(() => Department, (department) => department.id, {
-    eager: true,
+  @ManyToOne(() => Department, (dep) => dep.employees, {
     cascade: ['insert'],
   })
+  @JoinColumn({ name: 'departmentId' })
   department: Department;
 
-  @OneToMany(() => Statement, (statement) => statement.employee, {
+  @OneToMany(() => Statement, (statement) => statement.employeeId, {
     eager: true,
     cascade: ['insert'],
   })
   salary: Statement[];
 
-  @OneToMany(() => Donation, (dontation) => dontation.id, {
+  @OneToMany(() => Donation, (donation) => donation.employeeId, {
     eager: true,
     cascade: ['insert'],
   })
