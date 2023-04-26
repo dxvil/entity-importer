@@ -1,73 +1,24 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Entity parser and importer
+Tech stack: NestJS, TypeORM, MySQL in AWS Cloud
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+Start server:
 ```
+git clone git@github.com:dxvil/entity-importer.git
+npm install
+npm run start:dev
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
+> you can use a settings in file to connect an mysql db in aws cloud
 
-## Test
+This is a test assignment with described and implemented functionality below:
 
-```bash
-# unit tests
-$ npm run test
+The system should read files from a folder, parse them, and update a database upon startup. A parser needs to be developed, and a database with relational connections needs to be designed. Additionally, multiple HTTP APIs need to be provided to return query results.
 
-# e2e tests
-$ npm run test:e2e
+#### File format:
 
-# test coverage
-$ npm run test:cov
-```
+The file is a simple text format representing objects with properties and other nested objects. The hierarchy is determined by indentation (each level has 2 spaces). The type of each object is named with a capital letter, while properties are named with lowercase letters. The file represents a list of employees (Employee), each with basic properties (name, surname, ID). Each employee also belongs to a department (Department) and has a list of statements (Statement) for the year. The salary is determined by date and amount (always in $). Additionally, each employee may have records of charitable donations (Donation), where the donation amount may be in any currency. The file also contains exchange rates (Rate) for all date-currency pairs that were encountered in donations. In the database, it is sufficient to store the equivalent of donations in USD.
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+#### Queries:
+- Find employees who donated more than 10% of their average monthly salary for the last 6 months to charity and sort them by their minimum average annual salary.
+- Display departments in descending order of the difference between the maximum and minimum average annual salary. For each department, show up to 3 employees with the highest percentage increase in salary for the year and the size of their last salary.
+- Count the number of employees who donated more than $100 to charity. As a one-time reward, each employee will receive an equivalent amount of their contribution from a pool of $10,000. (If an employee donated $200 out of a total donation of $1000, they should receive 20% of $10,000.) Donations of less than $100 are included in the total donation pool but do not entitle the employees to a reward. Additionally, add $100 to each employee in the department with the highest total donations per person.
