@@ -1,0 +1,11 @@
+1. How to modify the code to support different file versions?
+As i have a Parser i will create a wrapper function for the first call in this case. 
+This function will operate a version of file by 1st line and call the exact methods for this version.
+I mean that we need to split logic for every version in another function because it's not proper to do everything in one.
+2. How would the import system change if exchange rate data is removed from the file, and it needs to be obtained asynchronously (via API)?
+We can request it from server where this information can be saved before.
+3. In the future, if the client wants to import files via a web interface, how would the system need to be changed?
+I design API in ay it can easily connect to Front-end side and it provide a meaningful response already.
+4. How would the queries change if imported data could be considered only for the previous month/year?
+Some of methods already includes a support for providing a specific constrains. It can be done throw adding a parameters to our endpoints.
+Then we can refactor our SQL-requests based on it.
