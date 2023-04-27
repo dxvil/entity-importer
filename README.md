@@ -20,5 +20,14 @@ The file is a simple text format representing objects with properties and other 
 
 #### Queries:
 - Find employees who donated more than 10% of their average monthly salary for the last 6 months to charity and sort them by their minimum average annual salary.
+```
+GET /employees/count-max-donations
+```
 - Display departments in descending order of the difference between the maximum and minimum average annual salary. For each department, show up to 3 employees with the highest percentage increase in salary for the year and the size of their last salary.
+```
+GET /departments/stat
+```
 - Count the number of employees who donated more than $100 to charity. As a one-time reward, each employee will receive an equivalent amount of their contribution from a pool of $10,000. (If an employee donated $200 out of a total donation of $1000, they should receive 20% of $10,000.) Donations of less than $100 are included in the total donation pool but do not entitle the employees to a reward. Additionally, add $100 to each employee in the department with the highest total donations per person.
+```
+GET /donations/reward
+```
