@@ -12,19 +12,13 @@ import { DepartmentModule } from './department/department.module';
 import { StatementModule } from './statement/statement.module';
 import { DonationModule } from './donation/donation.module';
 
-// type: 'mysql',
-// host: 'employees.clt3fa5eyyle.eu-north-1.rds.amazonaws.com',
-// port: 3306,
-// username: 'admin',
-// password: 'password',
-// database: 'employees',
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 'employees.clt3fa5eyyle.eu-north-1.rds.amazonaws.com',
       port: 3306,
-      username: 'root',
+      username: 'admin',
       password: 'password',
       database: 'employees',
       synchronize: true,
