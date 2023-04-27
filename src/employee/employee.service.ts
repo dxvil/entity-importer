@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Statement } from 'src/statement/statement.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Employee } from './employee.entity';
 
@@ -12,6 +13,10 @@ export class EmployeeService {
   ) {}
 
   async createEmployee(employee: Employee) {
+    return await this.employeeRepository.save(employee);
+  }
+
+  async updateEmployee(employee: Employee) {
     return await this.employeeRepository.save(employee);
   }
 
@@ -37,5 +42,15 @@ export class EmployeeService {
       .having('SUM(donation.amount) > AVG(statements.amount) * 6 * 0.1')
       .orderBy('minAnnualSalary', 'ASC')
       .getRawMany();
+  }
+
+  async countAmountEmployeesDonatedOver100() {
+    return await this.dataSource
+      .getRepository(Employee)
+      .createQueryBuilder('employees')
+      .leftJoin('employees.donations', 'donation')
+      .select('COUNT(DISTINCT employees.id)', 'count')
+      .where('CAST(donation.amount as DECIMAL(10,2)) > 100')
+      .getRawOne();
   }
 }

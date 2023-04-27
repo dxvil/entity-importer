@@ -58,4 +58,20 @@ export class DepartmentService {
       })
       .getRawMany();
   }
+
+  async departmentWithTheHighestDonatePerPerson() {
+    return await this.dataSource
+      .getRepository(Department)
+      .createQueryBuilder('departments')
+      .leftJoin('departments.employees', 'employee')
+      .leftJoin('employee.donations', 'donation')
+      .select('departments.id', 'id')
+      .addSelect(
+        'SUM(CAST(donation.amount as DECIMAL(10,2))) / COUNT(DISTINCT employee.id)',
+        'donationPerPerson',
+      )
+      .groupBy('departments.id')
+      .orderBy('donationPerPerson', 'DESC')
+      .getRawOne();
+  }
 }
