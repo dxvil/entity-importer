@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { Employee } from './employee/employee.entity';
 import { Rates } from './rates/rates.entity';
@@ -11,16 +13,25 @@ import { EmployeeModule } from './employee/employee.module';
 import { DepartmentModule } from './department/department.module';
 import { StatementModule } from './statement/statement.module';
 import { DonationModule } from './donation/donation.module';
+import { getEnvPath } from './common/helper/env.helper';
+
+const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
+
+dotenv.config({ path: envFilePath });
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath,
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'employees.clt3fa5eyyle.eu-north-1.rds.amazonaws.com',
-      port: 3306,
-      username: 'admin',
-      password: 'password',
-      database: 'employees',
+      host: process.env['DB_URL'],
+      port: Number(process.env['DB_PORT']),
+      username: process.env['DB_USER'],
+      password: process.env['DB_PASS'],
+      database: process.env['DB_NAME'],
       synchronize: true,
       entities: [Statement, Department, Rates, Donation, Employee],
     }),
