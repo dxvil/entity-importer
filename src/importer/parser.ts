@@ -15,8 +15,8 @@ import {
 import { Rates } from 'src/rates/rates.entity';
 import { monthesFormat } from 'src/shared/monthes';
 import { Statement } from 'src/statement/statement.entity';
-import { handleFileUpload } from './fileUpload';
-import { formatData } from './parseFileExtensions';
+import { handleFileUpload } from './helpers/fileUpload';
+import { formatData } from './helpers/parseFileExtensions';
 
 @Injectable()
 export class Parser {

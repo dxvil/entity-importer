@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Statement } from 'src/statement/statement.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Employee } from './employee.entity';
 

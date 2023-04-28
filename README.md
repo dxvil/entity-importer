@@ -6,7 +6,6 @@ Start server:
 git clone git@github.com:dxvil/entity-importer.git
 npm install
 npm run start:dev
-
 ```
 > you can use a settings in file to connect an mysql db in aws cloud
 
