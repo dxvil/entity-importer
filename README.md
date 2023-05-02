@@ -7,7 +7,11 @@ git clone git@github.com:dxvil/entity-importer.git
 npm install
 npm run start:dev
 ```
-> you can use a settings in file to connect an mysql db in aws cloud
+> you can use a settings in file to connect an mysql db in aws cloud.
+> if doesn't work: 
+> start mysql locally on your machine;
+> create a db employees;
+> change in `common/envs/.env` database credentials;
 
 This is a test assignment with described and implemented functionality below:
 
