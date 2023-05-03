@@ -1,13 +1,20 @@
 # Entity parser and importer
 Tech stack: NestJS, TypeORM, MySQL in AWS Cloud
-
-Start server:
+Start DB: 
 ```
 git clone git@github.com:dxvil/entity-importer.git
+sudo docker compose up
+sudo docker compose exec db bash
+mysql -h localhost -u root - P 3306 -p
+password
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+```
+Start server:
+```
 npm install
 npm run start:dev
 ```
-> you can use a settings in file to connect an mysql db in aws cloud
+> In the first version i used AWS RDS but my free tier ended so i replace it with local db in docker
 
 This is a test assignment with described and implemented functionality below:
 
