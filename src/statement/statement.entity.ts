@@ -1,4 +1,4 @@
-import { Employee } from 'src/employee/employee.entity';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('statements')
@@ -12,7 +12,7 @@ export class Statement {
   @Column()
   date: Date;
 
-  @ManyToOne(() => Employee)
+  @ManyToOne(() => EmployeeEntity)
   @JoinColumn({ name: 'employeeId' })
   employeeId: number;
 }

@@ -9,8 +9,10 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Employee } from 'src/employee/employee.class';
 import { EmployeeDto } from 'src/employee/employee.dto';
 import { RatesDto } from 'src/rates/rates.dto';
+import { Rates } from 'src/rates/rates.entity';
 import { Importer } from './importer';
 import { Parser } from './parser';
 import { ValidationImporter } from './validationImporter';
@@ -35,16 +37,13 @@ export class ImporterController {
 
     const [rates, employees] = parsedFile;
 
-    const ratesErrors = await this.validator.validate<RatesDto>(
-      rates,
-      RatesDto,
-    );
+    const ratesErrors = await this.validator.validate<Rates>(rates, RatesDto);
 
     if (ratesErrors.length > 0) {
       throw new BadRequestException(ratesErrors);
     }
 
-    const employeesErrors = await this.validator.validate<EmployeeDto>(
+    const employeesErrors = await this.validator.validate<Employee>(
       employees,
       EmployeeDto,
     );

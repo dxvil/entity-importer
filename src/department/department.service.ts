@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Employee } from 'src/employee/employee.entity';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 import { Statement } from 'src/statement/statement.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Department } from './department.entity';
@@ -43,7 +43,7 @@ export class DepartmentService {
             '(MAX(CASE WHEN statements.id = :sid THEN statements.amount END) - LAG(MAX(CASE WHEN statements.id = :sid THEN statements.amount END)) OVER (PARTITION BY employees.departmentId ORDER BY MAX(CASE WHEN statements.id = :sid THEN statements.amount END) DESC)) / LAG(MAX(CASE WHEN statements.id = :sid THEN statements.amount END)) OVER (PARTITION BY employees.departmentId ORDER BY MAX(CASE WHEN statements.id = :sid THEN statements.amount END) DESC) * 100',
             'percentage_increase',
           )
-          .from(Employee, 'employees')
+          .from(EmployeeEntity, 'employees')
           .leftJoin('employees.salary', 'statements')
           .where('employees.departmentId = departments.id')
           .orderBy('percentage_increase', 'DESC')

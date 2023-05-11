@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
-import { Employee } from './employee/employee.entity';
+import { EmployeeEntity } from './employee/employee.entity';
 import { Rates } from './rates/rates.entity';
 import { Donation } from './donation/donation.entity';
 import { Department } from './department/department.entity';
@@ -33,7 +33,7 @@ dotenv.config({ path: envFilePath });
       password: process.env['DB_PASS'],
       database: process.env['DB_NAME'],
       synchronize: true,
-      entities: [Statement, Department, Rates, Donation, Employee],
+      entities: [Statement, Department, Rates, Donation, EmployeeEntity],
     }),
     ImporterModule,
     RatesModule,

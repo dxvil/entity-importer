@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { filterUSDDonation } from 'src/donation/format/usdOnly';
-import { Employee } from 'src/employee/employee.entity';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
 import { RatesService } from 'src/rates/rates.service';
@@ -30,7 +30,7 @@ export class Importer {
     return res;
   }
 
-  async importEmployees(employeeList: Employee[]) {
+  async importEmployees(employeeList: EmployeeEntity[]) {
     const res = {
       uploaded: [],
       errors: [],

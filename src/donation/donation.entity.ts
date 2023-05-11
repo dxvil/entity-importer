@@ -1,4 +1,4 @@
-import { Employee } from 'src/employee/employee.entity';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
 @Entity('donation')
@@ -9,7 +9,7 @@ export class Donation {
   @Column()
   amount: string;
 
-  @ManyToOne(() => Employee)
+  @ManyToOne(() => EmployeeEntity)
   @JoinColumn({ name: 'employeeId' })
   employeeId: number;
 }

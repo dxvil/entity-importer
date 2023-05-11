@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Employee } from 'src/employee/employee.entity';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 import { DataSource, Repository } from 'typeorm';
 import { Donation } from './donation.entity';
 
@@ -22,7 +22,7 @@ export class DonationService {
 
   async countRewardsForDonators(sum: number) {
     return await this.dataSource
-      .getRepository(Employee)
+      .getRepository(EmployeeEntity)
       .createQueryBuilder('employees')
       .leftJoin('employees.donations', 'donation')
       .select('employees.id', 'id')

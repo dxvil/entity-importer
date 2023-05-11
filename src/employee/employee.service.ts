@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Employee } from './employee.entity';
+import { EmployeeEntity } from './employee.entity';
 
 @Injectable()
 export class EmployeeService {
   constructor(
-    @InjectRepository(Employee)
-    private employeeRepository: Repository<Employee>,
+    @InjectRepository(EmployeeEntity)
+    private employeeRepository: Repository<EmployeeEntity>,
     @InjectDataSource() private dataSource: DataSource,
   ) {}
 
-  async createEmployee(employee: Employee) {
+  async createEmployee(employee: EmployeeEntity) {
     return await this.employeeRepository.save(employee);
   }
 
-  async updateEmployee(employee: Employee) {
+  async updateEmployee(employee: EmployeeEntity) {
     return await this.employeeRepository.save(employee);
   }
 
@@ -29,7 +29,7 @@ export class EmployeeService {
 
   async countMaxDonationInTimeRange(timeRange: Date) {
     return await this.dataSource
-      .getRepository(Employee)
+      .getRepository(EmployeeEntity)
       .createQueryBuilder('employees')
       .select('employees.id', 'id')
       .addSelect('AVG(statements.amount)', 'avgSalary')
@@ -45,7 +45,7 @@ export class EmployeeService {
 
   async countAmountEmployeesDonatedOver100() {
     return await this.dataSource
-      .getRepository(Employee)
+      .getRepository(EmployeeEntity)
       .createQueryBuilder('employees')
       .leftJoin('employees.donations', 'donation')
       .select('COUNT(DISTINCT employees.id)', 'count')

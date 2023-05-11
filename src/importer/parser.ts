@@ -1,28 +1,26 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { Department } from 'src/department/department.entity';
-import { Donation } from 'src/donation/donation.entity';
-import { Employee } from 'src/employee/employee.entity';
+import { Employee } from 'src/employee/employee.class';
 import {
-  DEPARTMENT,
-  DONATION,
-  DONATIONS,
-  EMPLOYEE,
-  PARSING_VALUES,
+  ALL_VALID_KEYS,
+  EMPLOYEES_PART,
   RATE,
-  SALARY,
-  STATEMENT,
+  RATES_PART,
 } from 'src/employee/employeeConstans';
 import { Rates } from 'src/rates/rates.entity';
+import { RatesVisitor } from 'src/rates/rates.visitor';
 import { monthesFormat } from 'src/shared/monthes';
-import { Statement } from 'src/statement/statement.entity';
+import { EmployeeVisitor } from '../employee/employee.visitor';
 import { handleFileUpload } from './helpers/fileUpload';
 import { formatData } from './helpers/parseFileExtensions';
 
 @Injectable()
 export class Parser {
-  parsedFields: string[] = PARSING_VALUES;
+  constructor(
+    private employeeVisitor: EmployeeVisitor,
+    private ratesVisitor: RatesVisitor,
+  ) {}
 
-  async parseTextFile(file: Express.Multer.File) {
+  async parseTextFile(file: Express.Multer.File): Promise<[Rates[], Employee[]]> {
     try {
       await handleFileUpload(file);
       //handless correctly txt, csv, docx -> based on hierarchy and supported fields names
@@ -38,130 +36,53 @@ export class Parser {
       const data = file.buffer
         .toString()
         .replace(/\n/g, '')
-        .split(format.seperator);
+        .split(format.seperator)
+        .filter((val) => val);
 
-      let listKey = 0;
-      const listOfEmployees: Employee[] = [];
-      const listOfRates: Rates[] = [];
-      let currentKey = '';
-      let donationKey = 0;
-      let salaryKey = 0;
-      let ratesKey = 0;
+      //checking on what part of file we are
+      let filePartName = EMPLOYEES_PART;
 
-      data.forEach((string, i) => {
-        string.trim();
+      data.forEach((string) => {
+        const isValidKey = ALL_VALID_KEYS.some((key) => string.includes(key));
 
-        switch (string) {
-          case EMPLOYEE:
-            if (listOfEmployees.length !== 0) {
-              listKey++;
-            }
-            currentKey = EMPLOYEE.toLowerCase();
-            donationKey = 0;
-            salaryKey = 0;
-            listOfEmployees.push(new Employee());
-            break;
-          case DEPARTMENT:
-            //add deparment value to employee
-            currentKey = DEPARTMENT.toLowerCase();
-            listOfEmployees[listKey][currentKey] = new Department();
-            break;
-          case SALARY:
-            //add salary value to employee
-            currentKey = SALARY.toLowerCase();
-            listOfEmployees[listKey][currentKey] = [];
-            break;
-          case STATEMENT:
-            //add new statement to employee salary
-            const category = SALARY.toLowerCase();
-            if (listOfEmployees[listKey][category].length !== 0) {
-              salaryKey++;
-            }
-            listOfEmployees[listKey][category].push(new Statement());
-            currentKey = STATEMENT.toLowerCase();
-            break;
-          case DONATION:
-            //add donation object
-            if (!listOfEmployees[listKey][DONATIONS]) {
-              listOfEmployees[listKey][DONATIONS] = [];
-            } else {
-              donationKey++;
-            }
-            currentKey = DONATIONS;
-            listOfEmployees[listKey][currentKey].push(new Donation());
-            break;
-          case RATE:
-            if (listOfRates.length !== 0) {
-              ratesKey++;
-            }
-            currentKey = RATE.toLowerCase();
-            listOfRates.push(new Rates());
-            break;
-        }
+        if (isValidKey) {
+          string.trim();
 
-        if (string.includes(':')) {
-          //feeling objects with values based on key
-          let [key, val]: any = string.split(': ');
-
-          if (key === 'date') {
-            let [_, month, day, year] = val.trim().split(' ');
-            if (year.match(/[a-zA-Z]/g)) {
-              year = year.replace(/[a-zA-Z]/g, '');
-            }
-            val = new Date(year, monthesFormat[month], day);
-          }
-          if (key === 'id') {
-            val = +val;
+          if (string === RATE) {
+            filePartName = RATES_PART;
           }
 
-          if (currentKey === EMPLOYEE.toLowerCase()) {
-            //add values of employee
-            listOfEmployees[listKey][key] = val;
-          } else if (currentKey === DONATIONS) {
-            if (
-              !listOfEmployees[listKey][currentKey][donationKey]['employeeId']
-            ) {
-              listOfEmployees[listKey][currentKey][donationKey]['employeeId'] =
-                listOfEmployees[listKey].id;
-            }
-            listOfEmployees[listKey][currentKey][donationKey][key] = val;
-          } else if (currentKey === STATEMENT.toLowerCase()) {
-            //add values of statement
-            if (
-              !listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][
-                'employeeId'
-              ]
-            ) {
-              listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][
-                'employeeId'
-              ] = listOfEmployees[listKey].id;
-            }
-            listOfEmployees[listKey][SALARY.toLowerCase()][salaryKey][key] =
-              val;
-          } else if (currentKey === RATE.toLowerCase()) {
-            listOfRates[ratesKey][key] = val;
-          } else {
-            //add other values to object that don't base on special structure
-            listOfEmployees[listKey][currentKey][key] = val;
-          }
-        }
+          if (string.includes(':')) {
+            let [key, value]: any = string.split(': ');
 
-        if (
-          i !== 0 &&
-          string &&
-          !this.parsedFields.some((str) =>
-            string.toLowerCase().includes(str.toLowerCase()),
-          )
-        ) {
-          throw new BadRequestException({
-            message: `Please, check the correctness form of file`,
-            errorObj: string,
-          });
+            if (key === 'date') {
+              let [_, month, day, year] = value.trim().split(' ');
+
+              if (year.match(/[a-zA-Z]/g)) {
+                year = year.replace(/[a-zA-Z]/g, '');
+              }
+
+              value = new Date(+year, monthesFormat[month], +day);
+            }
+
+            filePartName === EMPLOYEES_PART
+              ? this.employeeVisitor.visit(':', key, value)
+              : this.ratesVisitor.visitRates(':', key, value);
+
+            return;
+          }
+
+          filePartName === EMPLOYEES_PART
+            ? this.employeeVisitor.visit(string)
+            : this.ratesVisitor.visitRates(string);
         }
       });
-      return [listOfRates, listOfEmployees];
+      this.employeeVisitor.endVisit('END');
+      this.ratesVisitor.endVisit('END');
+
+      return [this.ratesVisitor.end(), this.employeeVisitor.end()];
     } catch (err) {
-      return err;
+      throw new Error(err.message);
     }
   }
 }

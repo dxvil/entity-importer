@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 
 @Entity('employees')
-export class Employee {
+export class EmployeeEntity {
   @PrimaryColumn()
   id: number;
 
