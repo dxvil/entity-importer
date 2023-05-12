@@ -48,7 +48,9 @@ export class Importer {
         res.uploaded.push(employee);
       }
     } catch (err) {
-      res.errors.push(err.message);
+      if (err.code !== 'ER_DUP_ENTRY') {
+        res.errors.push(err.message);
+      }
     }
 
     return res;
