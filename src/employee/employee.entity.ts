@@ -22,7 +22,7 @@ export class EmployeeEntity {
   surname: string;
 
   @ManyToOne(() => Department, (dep) => dep.employees, {
-    cascade: ['insert'],
+    cascade: ['insert', 'update'],
   })
   @JoinColumn({ name: 'departmentId' })
   department: Department;

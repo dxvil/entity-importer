@@ -20,7 +20,9 @@ export class Parser {
     private ratesVisitor: RatesVisitor,
   ) {}
 
-  async parseTextFile(file: Express.Multer.File): Promise<[Rates[], Employee[]]> {
+  async parseTextFile(
+    file: Express.Multer.File,
+  ): Promise<[Rates[], Employee[]]> {
     try {
       await handleFileUpload(file);
       //handless correctly txt, csv, docx -> based on hierarchy and supported fields names

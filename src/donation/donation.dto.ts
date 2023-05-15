@@ -1,8 +1,11 @@
-import { IsDate, IsDecimal } from 'class-validator';
+import { IsDate, IsEnum, IsString } from 'class-validator';
+import { DonationSign } from './donation-sign';
 
 export class DonationDto {
-  @IsDecimal()
-  amount: number;
+  @IsString()
+  amount: string;
+  @IsEnum(DonationSign)
+  donationSign: string;
   @IsDate()
   date: Date;
 }

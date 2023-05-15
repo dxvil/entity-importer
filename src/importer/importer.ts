@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EmployeeDto } from 'src/employee/employee.dto';
 import { EmployeeEntity } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
