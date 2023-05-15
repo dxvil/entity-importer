@@ -51,12 +51,13 @@ export class ImporterController {
     if (employeesErrors.length > 0) {
       throw new BadRequestException(employeesErrors);
     }
+    console.log(employees.length);
     try {
-      const importRates = await this.importer.importRates(rates);
+      // const importRates = await this.importer.importRates(rates);
       const importEmployees = await this.importer.importEmployees(employees);
 
       return {
-        rates: importRates,
+        // rates: importRates,
         employees: importEmployees,
       };
     } catch (err) {
