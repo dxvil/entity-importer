@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { filterUSDDonation } from 'src/donation/format/usdOnly';
 import { EmployeeEntity } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
@@ -37,12 +36,6 @@ export class Importer {
     };
 
     try {
-      for (const employee of employeeList) {
-        if (employee.donations) {
-          employee.donations = filterUSDDonation(employee.donations);
-        }
-      }
-
       for (const employee of employeeList) {
         await this.employeeService.createEmployee(employee);
         res.uploaded.push(employee);
