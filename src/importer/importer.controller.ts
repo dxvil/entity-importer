@@ -11,11 +11,13 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Employee } from 'src/employee/employee.class';
 import { EmployeeDto } from 'src/employee/employee.dto';
+import { transformListOfEmployeesByDonation } from 'src/employee/helpers';
 import { RatesDto } from 'src/rates/rates.dto';
 import { Rates } from 'src/rates/rates.entity';
 import { Importer } from './importer';
 import { Parser } from './parser';
 import { ValidationImporter } from './validationImporter';
+import { EmployeeEntity } from 'src/employee/employee.entity';
 
 @Controller('importer')
 export class ImporterController {
@@ -35,7 +37,7 @@ export class ImporterController {
       return parsedFile;
     }
 
-    const [rates, employees] = parsedFile;
+    const [rates, employees]: [Rates[], Employee[]] = parsedFile;
 
     const ratesErrors = await this.validator.validate<Rates>(rates, RatesDto);
 
@@ -51,9 +53,16 @@ export class ImporterController {
     if (employeesErrors.length > 0) {
       throw new BadRequestException(employeesErrors);
     }
+
+    //transform data into the correct for DB Donation table form
+    const transformEmployeeByDonation: EmployeeEntity[] =
+      transformListOfEmployeesByDonation(employees);
+
     try {
       const importRates = await this.importer.importRates(rates);
-      const importEmployees = await this.importer.importEmployees(employees);
+      const importEmployees = await this.importer.importEmployees(
+        transformEmployeeByDonation,
+      );
 
       return {
         rates: importRates,

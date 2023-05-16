@@ -1,4 +1,4 @@
-export enum DonationTypes {
+export enum DonationSign {
   USD = 'USD',
   GBP = 'GBP',
   AUD = 'AUD',

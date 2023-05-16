@@ -5,6 +5,8 @@ import { StatementDto } from 'src/statement/statement.dto';
 
 export class EmployeeDto {
   @IsNotEmpty()
+  id: number;
+  @IsNotEmpty()
   name: string;
   @IsNotEmpty()
   surname: string;

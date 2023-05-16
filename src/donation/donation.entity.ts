@@ -1,6 +1,6 @@
 import { EmployeeEntity } from 'src/employee/employee.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { DonationTypes } from './donation-types';
+import { DonationSign } from './donation-sign';
 
 @Entity('donation')
 export class Donation {
@@ -12,11 +12,14 @@ export class Donation {
 
   @Column({
     type: 'enum',
-    enum: DonationTypes,
+    enum: DonationSign,
   })
-  donationType: DonationTypes;
+  donationSign: DonationSign;
 
   @ManyToOne(() => EmployeeEntity)
   @JoinColumn({ name: 'employeeId' })
   employeeId: number;
+
+  @Column()
+  date: Date;
 }
