@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Department } from 'src/department/department.entity';
+import { DepartmentService } from 'src/department/department.service';
 import { EmployeeEntity } from 'src/employee/employee.entity';
 import { EmployeeService } from 'src/employee/employee.service';
 import { Rates } from 'src/rates/rates.entity';
@@ -9,6 +11,7 @@ export class Importer {
   constructor(
     private ratesService: RatesService,
     private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
   ) {}
 
   async importRates(ratesList: Rates[]) {
@@ -28,20 +31,30 @@ export class Importer {
 
     return res;
   }
-
+  async importDepartment(department: Department) {
+    try {
+      await this.departmentService.createDepartment(department);
+      return department;
+    } catch (err) {
+      if (err.code !== 'ER_DUP_ENTRY' || err.errno !== 1062) {
+        throw new HttpException(err.message, 400);
+      }
+    }
+  }
   async importEmployees(employeeList: EmployeeEntity[]) {
     const res = {
-      uploaded: [],
+      uploadedEmployees: [],
+      uploadedDeparments: [],
       errors: [],
     };
 
-    try {
-      for (const employee of employeeList) {
+    for (const employee of employeeList) {
+      try {
+        await this.importDepartment(employee.department);
+        res.uploadedDeparments.push(employee.department);
         await this.employeeService.createEmployee(employee);
-        res.uploaded.push(employee);
-      }
-    } catch (err) {
-      if (err.code !== 'ER_DUP_ENTRY') {
+        res.uploadedEmployees.push(employee);
+      } catch (err) {
         res.errors.push(err.message);
       }
     }

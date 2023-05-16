@@ -14,7 +14,11 @@ export class DepartmentService {
   ) {}
 
   async createDepartment(department: Department) {
-    return await this.departmentRepository.save(department);
+    const isExist = await this.findDepartment(department.id);
+
+    if (!isExist) {
+      return await this.departmentRepository.save(department);
+    }
   }
   async findAll() {
     return await this.departmentRepository.find();
