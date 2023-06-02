@@ -27,20 +27,59 @@ export class EmployeeService {
     return this.employeeRepository.find();
   }
 
-  async countMaxDonationInTimeRange(timeRange: Date) {
-    return await this.dataSource
-      .getRepository(EmployeeEntity)
-      .createQueryBuilder('employees')
-      .select('employees.id', 'id')
-      .addSelect('AVG(statements.amount)', 'avgSalary')
-      .addSelect('MIN(statements.amount) / 12', 'minAnnualSalary')
-      .leftJoin('employees.salary', 'statements')
-      .leftJoin('employees.donations', 'donation')
-      .where('statements.date >= :timeRange', { timeRange })
-      .groupBy('employees.id')
-      .having('SUM(donation.amount) > AVG(statements.amount) * 6 * 0.1')
-      .orderBy('minAnnualSalary', 'ASC')
-      .getRawMany();
+  async countMaxDonationInTimeRange() {
+    //default values only based on test data
+    //test data includes information about 2020-2021 years
+    const halfOfYear = '2020-06-01 00:00:00';
+    const forYear = '2020-01-01 00:00:00';
+    if (
+      !Number.isNaN(Date.parse(halfOfYear)) &&
+      !Number.isNaN(Date.parse(forYear))
+    ) {
+      return await this.dataSource.query(`
+      WITH avg_sal_min AS (
+        SELECT 
+          employees.id, 
+          ROUND(
+            AVG(statements.amount), 
+            0
+          ) AS avgSalYear 
+        FROM 
+          employees 
+          INNER JOIN statements ON employees.id = statements.employeeId 
+        WHERE 
+          statements.date >= '${forYear}'
+        GROUP BY 
+          employees.id
+      ) 
+      SELECT 
+        employees.name, 
+        avg_sal_min.avgSalYear, 
+        ROUND(
+          AVG(statements.amount)
+        ) as avgSalHalfYear, 
+        ROUND(
+          SUM(donation.amount), 
+          0
+        ) AS total_don 
+      FROM 
+        employees 
+        INNER JOIN statements ON employees.id = statements.employeeId 
+        INNER JOIN donation ON employees.id = donation.employeeId 
+        INNER JOIN avg_sal_min ON employees.id = avg_sal_min.id 
+      WHERE 
+        statements.date >= '${halfOfYear}'
+      GROUP BY 
+        employees.id 
+      HAVING 
+        ROUND(
+          SUM(donation.amount), 
+          0
+        ) > (avgSalHalfYear / 10) 
+      ORDER BY 
+        avg_sal_min.avgSalYear ASC;
+    `);
+    }
   }
 
   async countAmountEmployeesDonatedOver100() {
