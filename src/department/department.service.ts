@@ -28,39 +28,94 @@ export class DepartmentService {
   }
 
   async departmentSalaryStat() {
-    return await this.dataSource
-      .getRepository(Department)
-      .createQueryBuilder('departments')
-      .addSelect(
-        'MAX(statements.amount) - MIN(statements.amount)',
-        'salary_diff',
-      )
-      .leftJoin('departments.employees', 'employees')
-      .leftJoin('employees.salary', 'statements')
-      .groupBy('departments.name')
-      .addGroupBy('departments.id')
-      .orderBy('salary_diff', 'DESC')
-      .where((sq) => {
-        sq.subQuery()
-          .select('GROUP_CONCAT(employees.name SEPARATOR ", ")', 'names')
-          .addSelect(
-            '(MAX(CASE WHEN statements.id = :sid THEN statements.amount END) - LAG(MAX(CASE WHEN statements.id = :sid THEN statements.amount END)) OVER (PARTITION BY employees.departmentId ORDER BY MAX(CASE WHEN statements.id = :sid THEN statements.amount END) DESC)) / LAG(MAX(CASE WHEN statements.id = :sid THEN statements.amount END)) OVER (PARTITION BY employees.departmentId ORDER BY MAX(CASE WHEN statements.id = :sid THEN statements.amount END) DESC) * 100',
-            'percentage_increase',
-          )
-          .from(EmployeeEntity, 'employees')
-          .leftJoin('employees.salary', 'statements')
-          .where('employees.departmentId = departments.id')
-          .orderBy('percentage_increase', 'DESC')
-          .limit(3)
-          .setParameters({
-            sid: this.dataSource
-              .getRepository(Statement)
-              .createQueryBuilder('statements')
-              .select('MAX(statements.id)')
-              .getQuery(),
-          });
-      })
-      .getRawMany();
+    //hardcoded values for test data
+    //for prod version should be refactored
+    const firstMonthSalaryStartDate = '2021-01-01';
+    const firstMonthSalaryEndDate = '2021-01-31';
+    const lastMonthSalaryStartDate = '2021-12-01';
+    const lastMonthSalaryEndDate = '2021-12-31';
+
+    if (
+      !Number.isNaN(Date.parse(firstMonthSalaryStartDate)) &&
+      !Number.isNaN(Date.parse(firstMonthSalaryEndDate)) &&
+      !Number.isNaN(Date.parse(lastMonthSalaryStartDate)) &&
+      !Number.isNaN(Date.parse(lastMonthSalaryEndDate))
+    ) {
+      return this.dataSource.query(`
+    WITH min_sal_table AS (
+      SELECT 
+        date, 
+        MIN(amount) as minSal, 
+        employeeId, 
+        departments.id as depId 
+      FROM 
+        statements 
+        INNER JOIN employees ON statements.employeeId = employees.id 
+        INNER JOIN departments ON employees.departmentId = departments.id 
+      WHERE 
+        date >= '${firstMonthSalaryStartDate}'
+        AND date <= '${firstMonthSalaryEndDate}' 
+      GROUP BY 
+        employeeId, 
+        date, 
+        departments.id
+    ), 
+    max_sal_table AS (
+      SELECT 
+        date, 
+        MAX(amount) as maxSal, 
+        amount as lastSal, 
+        employeeId, 
+        departments.id as depId 
+      FROM 
+        statements 
+        INNER JOIN employees ON statements.employeeId = employees.id 
+        INNER JOIN departments ON employees.departmentId = departments.id 
+      WHERE 
+        date >= '${lastMonthSalaryStartDate}' 
+        AND date <= '${lastMonthSalaryEndDate}' 
+      GROUP BY 
+        employeeId, 
+        date, 
+        departments.id, 
+        amount
+    ) 
+    SELECT 
+      * 
+    FROM 
+      (
+        SELECT 
+          max_sal_table.depId as depId, 
+          MAX(
+            (
+              max_sal_table.maxSal - min_sal_table.minSal
+            ) / min_sal_table.minSal * 100
+          ) as rate, 
+          max_sal_table.lastSal, 
+          statements.employeeId, 
+          ROW_NUMBER() OVER (
+            PARTITION BY departments.id 
+            ORDER BY 
+              MAX(
+                (
+                  max_sal_table.maxSal - min_sal_table.minSal
+                ) / min_sal_table.minSal * 100
+              ) ASC
+          ) AS row_num 
+        FROM 
+          statements 
+          INNER JOIN employees ON statements.employeeId = employees.id 
+          INNER JOIN departments ON employees.departmentId = departments.id 
+          INNER JOIN min_sal_table ON statements.employeeId = min_sal_table.employeeId 
+          INNER JOIN max_sal_table ON statements.employeeId = max_sal_table.employeeId 
+        GROUP BY 
+          depId, 
+          employeeId
+      ) AS subquery 
+    WHERE 
+      row_num < 4;
+    `);
+    }
   }
 
   async departmentWithTheHighestDonatePerPerson() {
